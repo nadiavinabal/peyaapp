@@ -9,18 +9,29 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = Color(0xFFEF9A9A),
+    onPrimary = Color.Black,
+    secondary = Color(0xFFE57373),
+    onSecondary = Color.Black,
+    background = Color(0xFF121212),
+    onBackground = Color.White,
+    surface = Color(0xFF1E1E1E),
+    onSurface = Color.White,
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+    primary = Color(0xFFB71C1C),
+    onPrimary = Color.White,
+    secondary = Color(0xFFD32F2F),
+    onSecondary = Color.White,
+    background = Color(0xFFFFEBEE),
+    onBackground = Color.Black,
+    surface = Color.White,
+    onSurface = Color.Black,
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
@@ -37,7 +48,7 @@ private val LightColorScheme = lightColorScheme(
 fun PeyaappTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {

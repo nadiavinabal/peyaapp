@@ -1,6 +1,7 @@
 package com.nadiavinabal.peyaapp.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -14,15 +15,19 @@ import com.nadiavinabal.peyaapp.ui.screen.ShoppingCartScreen
 import com.nadiavinabal.peyaapp.viewmodel.ProfileViewModel
 import androidx.compose.runtime.getValue
 import com.nadiavinabal.peyaapp.ui.screen.OrderHistoryScreen
+import com.nadiavinabal.peyaapp.ui.theme.ThemeViewModel
 
 @Composable
-fun NavigationWrapper() {
+fun NavigationWrapper(themeViewModel: ThemeViewModel) {
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
+    val isDarkTheme by themeViewModel.useDarkTheme.collectAsState()
 
     NavHost(navController = navController, startDestination = "login") {
         composable("login") {
-            LoginScreen(navigationToShop = { navController.navigate("shop") }, navigationToRegister = { navController.navigate("profile") })
+            LoginScreen(isDarkTheme = isDarkTheme,toggleTheme = { themeViewModel.toggleTheme() },
+                navigationToShop = { navController.navigate("shop") }, navigationToRegister = { navController.navigate("profile") }
+                )
         }
 
         composable("register") {
