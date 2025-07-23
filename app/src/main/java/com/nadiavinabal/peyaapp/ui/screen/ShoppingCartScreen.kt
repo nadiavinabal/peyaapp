@@ -2,32 +2,44 @@ package com.nadiavinabal.peyaapp.ui.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -44,135 +56,161 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.nadiavinabal.peyaapp.viewmodel.CartViewModel
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.nadiavinabal.peyaapp.database.entities.CartItemWithProductEntity
+import com.nadiavinabal.peyaapp.ui.component.MyAppTopBar
+import androidx.compose.foundation.lazy.items
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavController
+import com.nadiavinabal.peyaapp.ui.component.MyNavigationBar
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ShoppingCartScreen(viewModel: CartViewModel = hiltViewModel()) {
+fun ShoppingCartScreen(
+    cartViewModel: CartViewModel = hiltViewModel(),
+    isDarkTheme: Boolean,
+    toggleTheme: () -> Unit,
+    navController: NavController,
+    currentDestination: NavBackStackEntry?,
+) {
+    val cartItems by cartViewModel.cartItems.collectAsState()
+    val totalItems by cartViewModel.totalItems.collectAsState()
+    val totalPrice by cartViewModel.totalPrice.collectAsState()
+    val isCheckoutDone by cartViewModel.isCheckoutDone.collectAsState()
 
-    val cartItems by viewModel.cartItems.collectAsState()
-    val totalItems by viewModel.totalItems.collectAsState()
-    val totalPrice by viewModel.totalPrice.collectAsState()
+    var showCheckoutDialog by remember { mutableStateOf(false) }
 
     Scaffold(
+        topBar = {
+            MyAppTopBar(
+                title = "Shopping Cart",
+                isDarkTheme = isDarkTheme,
+                toggleTheme = toggleTheme
+            )
+        },
         bottomBar = {
-            Column {
-                Button(
-                    onClick = {viewModel.checkout()},
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE82630))
+            MyNavigationBar(
+                navController = navController, currentDestination = currentDestination
+            )
+        },
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(16.dp)
+        ) {
+            if (cartItems.isEmpty()) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(
+                        text = "Tu carrito está vacío",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Text("Pagar", color = Color(0xFFFCF8F8))
+                    items(cartItems) { item ->
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            elevation = CardDefaults.cardElevation(4.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .padding(8.dp)
+                                    .fillMaxWidth()
+                            ) {
+                                AsyncImage(
+                                    model = item.product.imageUrl,
+                                    contentDescription = item.product.productName,
+                                    modifier = Modifier
+                                        .size(100.dp)
+                                        .clip(RoundedCornerShape(8.dp)),
+                                    contentScale = ContentScale.Crop
+                                )
+
+                                Spacer(modifier = Modifier.width(12.dp))
+
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = item.product.productName,
+                                        style = MaterialTheme.typography.titleMedium
+                                    )
+                                    Text(
+                                        text = "$${item.product.price}",
+                                        style = MaterialTheme.typography.bodyLarge
+                                    )
+
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        IconButton(onClick = {
+                                            cartViewModel.decreaseQuantity(item.cartItemEntity)
+                                        }) {
+                                            Icon(Icons.Default.Remove, contentDescription = "Disminuir")
+                                        }
+                                        Text(item.cartItemEntity.quantity.toString())
+                                        IconButton(onClick = {
+                                            cartViewModel.increaseQuantity(item.cartItemEntity)
+                                        }) {
+                                            Icon(Icons.Default.Add, contentDescription = "Aumentar")
+                                        }
+                                    }
+                                }
+
+                                IconButton(onClick = {
+                                    cartViewModel.removeItem(item.cartItemEntity)
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Delete,
+                                        contentDescription = "Eliminar"
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
 
-                NavigationBar(containerColor = Color(0xFFFCF8F8)) {
-                    NavigationBarItem(selected = false, onClick = {}, icon = {
-                        Icon(Icons.Default.Home, contentDescription = "Inicio", tint = Color(0xFF974E52))
-                    })
-                    NavigationBarItem(selected = false, onClick = {}, icon = {
-                        Icon(Icons.Default.Search, contentDescription = "Buscar", tint = Color(0xFF974E52))
-                    })
-                    NavigationBarItem(selected = true, onClick = {}, icon = {
-                        Icon(Icons.Default.ShoppingCart, contentDescription = "Carrito", tint = Color(0xFF1B0E0F))
-                    })
-                    NavigationBarItem(selected = false, onClick = {}, icon = {
-                        Icon(Icons.Default.Person, contentDescription = "Perfil", tint = Color(0xFF974E52))
-                    })
+                Spacer(modifier = Modifier.height(1.dp).fillMaxWidth().background(Color.Gray))
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text("Total de productos: $totalItems", style = MaterialTheme.typography.bodyLarge)
+                Text("Total general: $${"%.2f".format(totalPrice)}", style = MaterialTheme.typography.titleLarge)
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Button(
+                    onClick = {
+                        cartViewModel.checkout()
+                        showCheckoutDialog = true
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Finalizar compra")
                 }
             }
         }
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
-                .background(Color(0xFFFCF8F8))
-        ) {
-            androidx.compose.material3.TopAppBar(
-                title = {
-                    Text("Carrito", textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
-                },
-                navigationIcon = {
-                    IconButton(onClick = {}) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
+
+        // ✅ AlertDialog al finalizar la compra
+        if (showCheckoutDialog && isCheckoutDone) {
+            AlertDialog(
+                onDismissRequest = { showCheckoutDialog = false },
+                title = { Text("Compra realizada") },
+                text = { Text("Tu pedido ha sido procesado exitosamente.") },
+                confirmButton = {
+                    TextButton(onClick = { showCheckoutDialog = false }) {
+                        Text("Aceptar")
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFFCF8F8))
+                }
             )
-            if (cartItems.isEmpty()) {
-                Text(
-                    "Tu carrito está vacío",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(32.dp),
-                    textAlign = TextAlign.Center
-                )
-            } else {
-                cartItems.forEach { itemWithProduct ->
-                    val cartItem = itemWithProduct.cartItemEntity
-                    val product = itemWithProduct.product
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            AsyncImage(
-                                model = product.imageUrl,
-                                contentDescription = product.productName,
-                                modifier = Modifier
-                                    .size(56.dp)
-                                    .clip(RoundedCornerShape(12.dp)),
-                                contentScale = ContentScale.Crop
-                            )
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Column {
-                                Text(product.productName, fontWeight = FontWeight.Medium, color = Color(0xFF1B0E0F))
-                                Text("${product.price} c/u", color = Color(0xFF974E52))
-                            }
-                        }
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            IconButton(onClick = { viewModel.decreaseQuantity(cartItem) }) {
-                                Text("-", color = Color(0xFF1B0E0F))
-                            }
-                            Text("${cartItem.quantity}", modifier = Modifier.width(24.dp), textAlign = TextAlign.Center)
-                            IconButton(onClick = { viewModel.increaseQuantity(cartItem) }) {
-                                Text("+", color = Color(0xFF1B0E0F))
-                            }
-                        }
-                    }
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(end = 16.dp),
-                        horizontalArrangement = Arrangement.End
-                    ) {
-                        OutlinedButton(
-                            onClick = { viewModel.removeItem(cartItem) },
-                            colors = ButtonDefaults.outlinedButtonColors(containerColor = Color(0xFFF3E7E8))
-                        ) {
-                            Text("Eliminar", color = Color(0xFF1B0E0F))
-                        }
-                    }
-                }
-
-                Text("Resumen del pedido", fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
-                Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text("Cantidad de productos", color = Color(0xFF974E52))
-                        Text("$totalItems", color = Color(0xFF1B0E0F))
-                    }
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text("Total", color = Color(0xFF974E52))
-                        Text("$${"%.2f".format(totalPrice)}", color = Color(0xFF1B0E0F))
-                    }
-                }
-            }
-
         }
     }
 }
+
+
+
 
 

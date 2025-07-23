@@ -45,7 +45,12 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
         }
 
         composable("shoppingCart") {
-            ShoppingCartScreen()
+            ShoppingCartScreen(
+                isDarkTheme = isDarkTheme,
+                toggleTheme = { themeViewModel.toggleTheme() },
+                navController= navController,
+                currentDestination = currentBackStackEntry,
+            )
         }
 
         composable("profile") {
