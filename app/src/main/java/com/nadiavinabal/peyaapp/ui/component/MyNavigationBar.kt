@@ -38,13 +38,6 @@ fun MyNavigationBar(
             }
         )
         NavigationBarItem(
-            selected = false,
-            onClick = { /* Próximamente */ },
-            icon = {
-                Icon(Icons.Default.Search, contentDescription = "Buscar", tint = Color(0xFF974E52))
-            }
-        )
-        NavigationBarItem(
             selected = currentDestination?.destination?.route == "shoppingCart",
             onClick = {
                 if (currentDestination?.destination?.route != "shoppingCart") {

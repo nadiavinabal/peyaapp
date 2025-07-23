@@ -20,7 +20,7 @@ class ProductRepositoryImpl @Inject constructor(
 
     private val initialProducts = listOf(
         Product(
-            id = "68472a818559f3a51f77c2c2",
+            _id = "68472a818559f3a51f77c2c2",
             name = "Tacos al pastor",
             price = 45.0,
             imageUrl = "https://comedera.com/wp-content/uploads/sites/9/2017/08/tacos-al-pastor-receta.jpg",
@@ -29,7 +29,7 @@ class ProductRepositoryImpl @Inject constructor(
             hasDrink = true
         ),
         Product(
-            id = "68472aae8559f3a51f77c2c4",
+            _id = "68472aae8559f3a51f77c2c4",
             name = "Burrito de res",
             price = 60.0,
             imageUrl = "https://www.recetasnestle.com.mx/sites/default/files/srh_recipes/cff9881a271d21ae3d098ba68d5ecd18.jpg",
@@ -38,7 +38,7 @@ class ProductRepositoryImpl @Inject constructor(
             category = "General"
         ),
         Product(
-            id = "68472ae08559f3a51f77c2c6",
+            _id = "68472ae08559f3a51f77c2c6",
             name = "Hamburguesa clásica",
             price = 70.0,
             imageUrl = "https://imag.bonviveur.com/hamburguesa-clasica.jpg",
@@ -47,7 +47,7 @@ class ProductRepositoryImpl @Inject constructor(
             category = "General",
         ),
         Product(
-            id = "68472b2d8559f3a51f77c2c9",
+            _id = "68472b2d8559f3a51f77c2c9",
             name = "Pizza margarita",
             price = 120.0,
             imageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDx46gfGPL3XKmoiXU_pQzvINxjjOFsXLoAA&s",
@@ -55,6 +55,25 @@ class ProductRepositoryImpl @Inject constructor(
             description = "Salsa de tomate, mozzarella y albahaca fresca.",
             category = "General",
         ),
+        Product(
+            _id = "68472b3e8559f3a51f77c2cb",
+            name= "Hot dog especial",
+            description = "Salchicha jumbo, tocino, cebolla caramelizada y mostaza.",
+            imageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQaKqDVCWtGQzA2-d1WvRmTfPi0krczx2pwzQ&s",
+            price= 50.0,
+            hasDrink= true,
+            category = "General"
+        ),
+        Product(
+            _id = "68472bb28559f3a51f77c2cd",
+            name = "Ensalada Cesar",
+            description = "Lechuga romana, crutones, parmesano y aderezo César.",
+            imageUrl= "https://cdn5.recetasdeescandalo.com/wp-content/uploads/2016/06/Ensalada-cesar-con-pollo-y-su-salsa-casera.-Receta-e-ingredientes.jpg",
+            price = 55.0,
+            hasDrink = false,
+            category = "General"
+        )
+
 
     )
 

@@ -1,7 +1,7 @@
 package com.nadiavinabal.peyaapp.model
 
 data class Product(
-    val id: String,
+    val _id: String,
     val name: String,
     val price: Double,
     val imageUrl: String,

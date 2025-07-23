@@ -14,6 +14,7 @@ import com.nadiavinabal.peyaapp.ui.screen.ShopScreen
 import com.nadiavinabal.peyaapp.ui.screen.ShoppingCartScreen
 import com.nadiavinabal.peyaapp.viewmodel.ProfileViewModel
 import androidx.compose.runtime.getValue
+import androidx.navigation.NavController
 import com.nadiavinabal.peyaapp.ui.screen.OrderHistoryScreen
 import com.nadiavinabal.peyaapp.ui.theme.ThemeViewModel
 
@@ -36,10 +37,10 @@ fun NavigationWrapper(themeViewModel: ThemeViewModel) {
 
         composable("shop") {
             ShopScreen(
-                navigationBack = { navController.popBackStack() },
-                navigationToShoppingCart = { navController.navigate("shoppingCart") },
-                navController = navController,
-                currentDestination = currentBackStackEntry
+                isDarkTheme = isDarkTheme,
+                toggleTheme = { themeViewModel.toggleTheme() },
+                navController= navController,
+                currentDestination = currentBackStackEntry,
             )
         }
 

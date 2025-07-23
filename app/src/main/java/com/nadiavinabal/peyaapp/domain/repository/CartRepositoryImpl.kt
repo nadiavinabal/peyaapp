@@ -1,5 +1,6 @@
 package com.nadiavinabal.peyaapp.domain.repository
 
+import android.util.Log
 import com.nadiavinabal.peyaapp.database.dao.CartDao
 import com.nadiavinabal.peyaapp.database.dao.OrderHistoryDao
 import com.nadiavinabal.peyaapp.database.dao.OrderItemDao

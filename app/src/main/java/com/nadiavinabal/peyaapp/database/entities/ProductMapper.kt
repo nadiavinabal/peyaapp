@@ -7,5 +7,5 @@ fun ProductEntity.toDomain() = Product(
 )
 
 fun Product.toEntity() = ProductEntity(
-    id, name, price, imageUrl, category, hasDrink, description
+    _id, name, price, imageUrl, category, hasDrink, description
 )

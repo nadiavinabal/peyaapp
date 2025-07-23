@@ -8,6 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -19,7 +20,10 @@ class ShopViewModel @Inject constructor(
     private val _products = MutableStateFlow<List<Product>>(emptyList())
     val products: StateFlow<List<Product>> = _products
 
-    private val _filteredProducts = MutableStateFlow<List<Product>>(emptyList())
+    private val _loading = MutableStateFlow(false)
+    val loading: StateFlow<Boolean> = _loading.asStateFlow()
+
+   /* private val _filteredProducts = MutableStateFlow<List<Product>>(emptyList())
     val filteredProducts: StateFlow<List<Product>> = _filteredProducts
 
 
@@ -31,35 +35,34 @@ class ShopViewModel @Inject constructor(
 
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
-
+   */
     init {
         loadProducts()
     }
 
     fun loadProducts() {
         viewModelScope.launch {
-            _isLoading.value = true
-            _error.value = null
+            _loading.value = true
             try {
                 productRepository.getAllProducts()
                     .collect { products ->
                         _products.value = products
-                        _filteredProducts.value = products
+
                     }
             } catch (e: Exception) {
-                _error.value = "Error loading products: ${e.message}"
+                //_error.value = "Error loading products: ${e.message}"
             } finally {
-                _isLoading.value = false
+                _loading.value = false
             }
         }
     }
 
-    fun onSearchQueryChanged(query: String) {
+   /* fun onSearchQueryChanged(query: String) {
         _searchQuery.value = query
         filterProducts(query)
-    }
+    } */
 
-    private fun filterProducts(query: String) {
+    /*private fun filterProducts(query: String) {
         if (query.isBlank()) {
             _filteredProducts.value = _products.value
         } else {
@@ -67,5 +70,5 @@ class ShopViewModel @Inject constructor(
                 product.name.contains(query, ignoreCase = true)
             }
         }
-    }
+    }*/
 }
